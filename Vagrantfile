@@ -4,7 +4,7 @@
 MACHINES = {
   :otuslinux => {
         :box_name => "centos/7",
-        :ip_addr => '192.168.11.101',
+#        :ip_addr => '192.168.11.101',
 	:disks => {
 		:sata1 => {
 			:dfile => './sata1.vdi',
@@ -25,6 +25,11 @@ MACHINES = {
                         :dfile => './sata4.vdi',
                         :size => 250, # Megabytes
                         :port => 4
+                },
+        	:sata5 => {
+                        :dfile => './sata5.vdi',
+                        :size => 250, # Megabytes
+                        :port => 5
                 }
 
 	}
@@ -44,8 +49,12 @@ Vagrant.configure("2") do |config|
 
           #box.vm.network "forwarded_port", guest: 3260, host: 3260+offset
 
-          box.vm.network "private_network", ip: boxconfig[:ip_addr]
-
+          #box.vm.network "private_network", ip: boxconfig[:ip_addr]
+		if boxconfig.key?(:net)
+		   boxconfig[:net].each do |ipconf|
+		   box.vm.network "private_network", ipconf
+		end
+	   end
           box.vm.provider :virtualbox do |vb|
             	  vb.customize ["modifyvm", :id, "--memory", "1024"]
                   needsController = false
